@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "new": "cpp"
+    },
+    "cmake.configureOnOpen": false,
+    "C_Cpp.errorSquiggles": "disabled"
+}
