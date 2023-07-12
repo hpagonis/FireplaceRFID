@@ -2,15 +2,17 @@
 #include <MFRC522.h>
 #include <SPI.h>
 
-#define BOARD8
+#define BOARD4
 
-#define RST 15
-#define SWT 25
 #define ID_LENGTH 7
 
 #ifdef BOARD4
+  #define RST 15
+  #define SWT 25
   #define MAX_RC522 4
 #else
+  #define RST 15
+  #define SWT 25
   #define MAX_RC522 8
 #endif
 
@@ -30,6 +32,7 @@ struct RC522 {
     {.pin =  4, .uids = {{0x53, 0xB2, 0xFC, 0xCC, 0x60, 0x00, 0x01},{0x53, 0x72, 0xFA, 0xCC, 0x60, 0x00, 0x01}}, .present = false, .valid = false},
     {.pin = 16, .uids = {{0x53, 0xB7, 0xFC, 0xCC, 0x60, 0x00, 0x01},{0x53, 0x73, 0xFA, 0xCC, 0x60, 0x00, 0x01}}, .present = false, .valid = false}
   };
+  static uint8_t LED_pin[4] = {26, 27, 14, 12};
 #else
   struct RC522 Rc522[] = {
     {.pin = 22, .uids = {{0x53, 0xE8, 0xFB, 0xCC, 0x60, 0x00, 0x01},{0x53, 0x5C, 0xFA, 0xCC, 0x60, 0x00, 0x01}}, .present = false, .valid = false},
@@ -43,7 +46,6 @@ struct RC522 {
   };
 #endif
 
-// static uint8_t LED_pin[4] = {26, 27, 14, 12};
 
 void setup() {
   for (int i=0; i< MAX_RC522; i++) {
@@ -54,10 +56,12 @@ void setup() {
   pinMode(SWT, OUTPUT);
   digitalWrite(RST, HIGH);
   digitalWrite(SWT, LOW);
-  // for (int i=0; i<4; i++) {
-  //   pinMode(LED_pin[i], OUTPUT);
-  //   digitalWrite(LED_pin[i], LOW);
-  // }
+  #ifdef BOARD4
+    for (int i=0; i<4; i++) {
+      pinMode(LED_pin[i], OUTPUT);
+      digitalWrite(LED_pin[i], LOW);
+    }
+  #endif
   Serial.begin(115200);
   SPI.begin( SCK, MISO, MOSI, -1);
   for (uint32_t index = 0; index < MAX_RC522; index++) {
@@ -98,10 +102,14 @@ void loop() {
         // if (Rc522[index].valid) {
         //   Serial.printf("Valid card %d\n", index + 1);
         // }
-        // digitalWrite(LED_pin[index], HIGH);
+        #ifdef BOARD4
+          digitalWrite(LED_pin[index], HIGH);
+        #endif
       } else {
         Rc522[index].present = false;
-        // digitalWrite(LED_pin[index], LOW);
+        #ifdef BOARD4
+          digitalWrite(LED_pin[index], LOW);
+        #endif
       }
     } else {
       Rc522[index].valid = false;
